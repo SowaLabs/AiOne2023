@@ -35,7 +35,7 @@ public class Program
 		services.AddSingleton(new Brain(
 			"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",
             //$"{AppContext.BaseDirectory}/FAQ_embeddings.jsonl"
-            @"C:\Work\AiOne2023\data\FAQ_embeddings.jsonl"
+            "/models/FAQ_embeddings.jsonl"
         ));
 		services.AddSingleton<LipSyncGenerator>();
 		services.AddSingleton<TextAnswerGenerator>();
