@@ -34,7 +34,7 @@ public class Program
 		services.AddScoped<SpeechGenerator>();
 		services.AddSingleton(new Brain(
 			"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",
-			@"C:\Repositories\Playing and Testing\Hackathon\AiOne2023\FAQ_embeddings.jsonl"
+			$"{AppContext.BaseDirectory}/FAQ_embeddings.jsonl"
 		));
 		services.AddSingleton<LipSyncGenerator>();
 		services.AddSingleton<TextAnswerGenerator>();
