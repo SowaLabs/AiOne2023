@@ -9,6 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["AiOneChatbot/AiOneChatbot.csproj", "AiOneChatbot/"]
 COPY ["Brain/Brain.csproj", "Brain/"]
+COPY ["Mouth/Mouth.csproj", "Mouth/"]
 RUN dotnet restore "AiOneChatbot/AiOneChatbot.csproj"
 COPY . .
 WORKDIR "/src/AiOneChatbot"

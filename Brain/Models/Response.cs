@@ -1,4 +1,4 @@
-﻿namespace AiOne.Chatbot.Models
+﻿namespace AiOne.Chatbot.Brain.Models
 {
     public class Response
     {
