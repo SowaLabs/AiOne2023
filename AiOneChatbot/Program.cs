@@ -1,68 +1,55 @@
-using System.Reflection;
+using AiOneChatbot.Api;
 using AiOneChatbot.Application.Chatbot.Speech;
 using AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
-using Microsoft.OpenApi.Models;
+using AiOneChatbot.Application.Config;
+using GM.Utility;
+using GM.WebAPI;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
-Version VERSION = Version.Parse("1.0.0");
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(swagOptions =>
+namespace AiOneChatbot;
+public class Program
 {
-    swagOptions.SwaggerDoc($"v{VERSION.Major}", new OpenApiInfo
+    public static Task Main(string[] args)
     {
-        Title = "AiOne Chatbot API",
-        Version = VERSION.ToString(3),
-        Contact = new OpenApiContact
-        {
-            Name = "AiOne team (Miha Grcar, Gregor Mohorko, Rok Bajec, Mitja Belak)",
-        },
-        Description = "\nAiOne Chatbot API service."
-	});
+        return GMWebApi.Run<Program, AiOneChatbotConfig>(
+			args: args,
+			serviceConfigurator: ConfigureServices,
+			setupSwaggerGeneration: SetupSwaggerGeneration,
+			setupSwaggerUI: SetupSwaggerUI,
+			addCorsMiddleWare: false,
+			addAuthMiddleware: false,
+			xmlDocTypes: new Type[] { typeof(Program) }
+			);
+	}
 
-    swagOptions.EnableAnnotations();
-    swagOptions.UseAllOfToExtendReferenceSchemas();
+	private static void ConfigureServices(
+		IServiceCollection services,
+		AiOneChatbotConfig config
+		)
+	{
+		// services
+		services.AddScoped<SpeechGenerator>();
+		services.AddSingleton<TextAnswerGenerator>();
+	}
 
-	// Use method name as operationId
-	swagOptions.CustomOperationIds(apiDesc => apiDesc.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null);
-}).AddSwaggerGenNewtonsoftSupport();
+	private static void SetupSwaggerGeneration(SwaggerGenOptions swaggerGenOptions)
+	{
+		// documents
+		swaggerGenOptions.SwaggerDoc(
+			name: AiOneChatbotApiInfo.SERVICE_API_GROUP_CHATBOT,
+			info: AiOneChatbotApiInfo.GetOpenApiInfo($"{AiOneChatbotApiInfo.SERVICE_NAME} {AiOneChatbotApiInfo.SERVICE_API_GROUP_CHATBOT.ToTitleCase()} API")
+			);
 
-builder.Services.ConfigureSwaggerGen(options =>
-{
-    var xmlDocFile = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
-    if(File.Exists(xmlDocFile)) {
-        options.IncludeXmlComments(xmlDocFile);
-    }
-});
+		// security definitions
+	}
 
-// services
-builder.Services.AddScoped<SpeechGenerator>();
-builder.Services.AddSingleton<TextAnswerGenerator>();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint($"v{VERSION.Major}/swagger.json", "AiOne Chatbot API");
-    });
+	private static void SetupSwaggerUI(SwaggerUIOptions swaggerUIOptions)
+	{
+		// endpoints
+		swaggerUIOptions.SwaggerEndpoint(
+			url: $"{AiOneChatbotApiInfo.SERVICE_API_GROUP_CHATBOT}/swagger.json",
+			name: $"{AiOneChatbotApiInfo.SERVICE_NAME} {AiOneChatbotApiInfo.SERVICE_API_GROUP_CHATBOT.ToTitleCase()} API"
+			);
+	}
 }
-
-app.UseRouting();
-
-//app.UseHttpsRedirection();
-
-//app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
