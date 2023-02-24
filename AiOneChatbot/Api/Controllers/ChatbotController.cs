@@ -32,13 +32,14 @@ public class ChatbotController : ControllerBase
         )
     {
         try {
-			string textAnswer = _textAnswerGenerator.GetTextAnswer(question);
-			byte[] audioFile = await _speechGenerator.GenerateSpeechAudioFile(textAnswer);
+			var textAnswer = _textAnswerGenerator.GetTextAnswer(question);
+			byte[] audioFile = await _speechGenerator.GenerateSpeechAudioFile(textAnswer.answer);
             LipSync lipSync = _lipSyncGenerator.GenerateLipSync(audioFile);
 
 			return new ChatbotResponse
 			{
-				AnswerText = textAnswer,
+				AnswerText = textAnswer.answer,
+                Prompt = textAnswer.prompt,
 				AnswerSpeechAudioFile = Convert.ToBase64String(audioFile),
                 LipSyncAnimation = lipSync
 			};
@@ -48,5 +49,11 @@ public class ChatbotController : ControllerBase
                 AnswerText = e.ToString()
             };
         }
+    }
+
+    [HttpDelete("history")]
+    public void DeleteHistory()
+    {
+        _textAnswerGenerator.DeleteHistory();
     }
 }

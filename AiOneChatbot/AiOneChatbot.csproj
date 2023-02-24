@@ -13,6 +13,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Brain\Brain.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Update="NLog.config">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>

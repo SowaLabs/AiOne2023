@@ -4,6 +4,8 @@
 	{
 		public string AnswerText { get; init; }
 
+		public string Prompt { get; init; }
+
 		/// <summary>
 		/// Base64 encoded.
 		/// </summary>

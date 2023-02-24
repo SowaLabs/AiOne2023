@@ -1,13 +1,28 @@
-﻿namespace AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
+﻿using AiOne.Chatbot.Logic;
+
+namespace AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
 
 /// <summary>
 /// Singleton.
 /// </summary>
 public class TextAnswerGenerator
 {
-	public string GetTextAnswer(string question)
+	private readonly Brain _brain;
+
+	public TextAnswerGenerator(Brain brain)
 	{
-		// FIXME
-		return $"You have asked me this question: '{question}'.";
+		_brain = brain;
+	}
+
+	public (string answer, string prompt) GetTextAnswer(string question)
+	{
+		var response = _brain.GetResponse(question);
+
+		return (response.Text, response.Prompt);
+	}
+
+	public void DeleteHistory()
+	{
+		_brain.ClearHistory();
 	}
 }
