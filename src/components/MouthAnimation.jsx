@@ -8,13 +8,13 @@ const MouthAnimation = ({ duration, mouthCues }) => {
     const totalDuration = duration * 1000;
 
     const updateValue = () => {
-      const currentTime = new Date().getTime() - startTime;
-      const progress = Math.min(currentTime / totalDuration, 1);
+      const currentTime = (new Date().getTime() - startTime) / 1000;
+      //const progress = Math.min(currentTime / totalDuration, 1);
       const currentCue = mouthCues.find(
-        (cue) => cue.start <= progress && cue.end >= progress
+        (cue) => cue.start >= currentTime && cue.end <= currentTime
       );
 
-      console.log(progress, mouthCues, currentCue);
+      console.log(currentTime, mouthCues, currentCue);
 
       if (currentCue) {
         setCurrentValue(currentCue.value);
@@ -22,7 +22,7 @@ const MouthAnimation = ({ duration, mouthCues }) => {
         setCurrentValue("X");
       }
 
-      if (currentTime >= totalDuration) {
+      if (currentTime >= totalDuration / 1000) {
         clearInterval(intervalId);
         setCurrentValue("");
       }
@@ -34,7 +34,7 @@ const MouthAnimation = ({ duration, mouthCues }) => {
     return () => clearInterval(intervalId);
   }, [duration, mouthCues]);
 
-  return <div className={`mouth ${currentValue}`} />;
+  return <div className={`mouth2 ${currentValue}`} />;
 };
 
 export default MouthAnimation;
