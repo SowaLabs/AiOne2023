@@ -33,6 +33,27 @@ public class Program
 		services.AddScoped<SpeechGenerator>();
 		services.AddSingleton<LipSyncGenerator>();
 		services.AddSingleton<TextAnswerGenerator>();
+
+		// cors
+		string[] allowedOrigins = "http://localhost:3000"
+			.Split(';')
+			.Select(url =>
+			{
+				return new Uri(url.Trim()).GetLeftPart(UriPartial.Authority);
+			})
+			.Distinct()
+			.ToArray();
+		services.AddCors(options =>
+		{
+			options.AddDefaultPolicy(corsPolicyBuilder =>
+			{
+				corsPolicyBuilder
+					.WithOrigins(allowedOrigins)
+					.AllowAnyHeader()
+					.AllowCredentials()
+					.AllowAnyMethod();
+			});
+		});
 	}
 
 	private static void SetupSwaggerGeneration(SwaggerGenOptions swaggerGenOptions)
