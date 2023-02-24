@@ -40,14 +40,15 @@ public class Program
 		services.AddSingleton<TextAnswerGenerator>();
 
 		// cors
-		string[] allowedOrigins = "http://localhost:3000"
-			.Split(';')
-			.Select(url =>
-			{
-				return new Uri(url.Trim()).GetLeftPart(UriPartial.Authority);
-			})
-			.Distinct()
-			.ToArray();
+		//string[] allowedOrigins = "*"
+		//	.Split(';')
+		//	.Select(url =>
+		//	{
+		//		return new Uri(url.Trim()).GetLeftPart(UriPartial.Authority);
+		//	})
+		//	.Distinct()
+		//	.ToArray();
+		string[] allowedOrigins = new string[] { "*" };
 		services.AddCors(options =>
 		{
 			options.AddDefaultPolicy(corsPolicyBuilder =>
