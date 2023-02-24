@@ -1,4 +1,5 @@
 using AiOneChatbot.Api;
+using AiOneChatbot.Application.Chatbot.LipSyncGeneration;
 using AiOneChatbot.Application.Chatbot.Speech;
 using AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
 using AiOneChatbot.Application.Config;
@@ -30,6 +31,7 @@ public class Program
 	{
 		// services
 		services.AddScoped<SpeechGenerator>();
+		services.AddSingleton<LipSyncGenerator>();
 		services.AddSingleton<TextAnswerGenerator>();
 	}
 

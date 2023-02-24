@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using AiOneChatbot.Application.Chatbot.Dto;
+using AiOneChatbot.Application.Chatbot.LipSyncGeneration;
 using AiOneChatbot.Application.Chatbot.Speech;
 using AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +11,17 @@ namespace AiOneChatbot.Api.Controllers;
 [Route("[controller]")]
 public class ChatbotController : ControllerBase
 {
-    private readonly SpeechGenerator _speechGenerator;
+    private readonly LipSyncGenerator _lipSyncGenerator;
+	private readonly SpeechGenerator _speechGenerator;
     private readonly TextAnswerGenerator _textAnswerGenerator;
 
     public ChatbotController(
+        LipSyncGenerator lipSyncGenerator,
         SpeechGenerator speechGenerator,
         TextAnswerGenerator textAnswerGenerator
         )
     {
+        _lipSyncGenerator = lipSyncGenerator;
         _speechGenerator = speechGenerator;
         _textAnswerGenerator = textAnswerGenerator;
     }
@@ -30,11 +34,13 @@ public class ChatbotController : ControllerBase
         try {
 			string textAnswer = _textAnswerGenerator.GetTextAnswer(question);
 			byte[] audioFile = await _speechGenerator.GenerateSpeechAudioFile(textAnswer);
+            LipSync lipSync = _lipSyncGenerator.GenerateLipSync(audioFile);
 
 			return new ChatbotResponse
 			{
 				AnswerText = textAnswer,
-				AnswerSpeechAudioFile = Convert.ToBase64String(audioFile)
+				AnswerSpeechAudioFile = Convert.ToBase64String(audioFile),
+                LipSyncAnimation = lipSync
 			};
 		} catch(Exception e) {
             return new ChatbotResponse

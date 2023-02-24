@@ -8,5 +8,7 @@
 		/// Base64 encoded.
 		/// </summary>
 		public string AnswerSpeechAudioFile { get; init; }
+
+		public LipSync LipSyncAnimation { get; init; }
 	}
 }
