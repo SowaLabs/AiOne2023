@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AiOneChatbot.Application.Chatbot.Dto;
+using AiOneChatbot.Application.Chatbot.Speech;
+using AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AiOneChatbot.Controllers;
@@ -8,9 +10,16 @@ namespace AiOneChatbot.Controllers;
 [Route("[controller]")]
 public class ChatbotController : ControllerBase
 {
-    public ChatbotController()
-    {
+    private readonly SpeechGenerator _speechGenerator;
+	private readonly TextAnswerGenerator _textAnswerGenerator;
 
+    public ChatbotController(
+		SpeechGenerator speechGenerator,
+		TextAnswerGenerator textAnswerGenerator
+		)
+    {
+        _speechGenerator = speechGenerator;
+        _textAnswerGenerator = textAnswerGenerator;
     }
 
     [HttpGet]
@@ -18,10 +27,13 @@ public class ChatbotController : ControllerBase
         [Required][FromQuery] string question
         )
     {
-        // FIXME
-        return new ChatbotResponse
+        string textAnswer = _textAnswerGenerator.GetTextAnswer(question);
+        byte[] audioFile = _speechGenerator.GenerateSpeechAudioFile(textAnswer);
+
+		return new ChatbotResponse
         {
-            AnswerText = $"You have asked me this question: '{question}'."
-        };
+            AnswerText = textAnswer,
+            AnswerSpeechAudioFile = Convert.ToBase64String(audioFile)
+		};
     }
 }

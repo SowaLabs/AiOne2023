@@ -1,4 +1,6 @@
 using System.Reflection;
+using AiOneChatbot.Application.Chatbot.Speech;
+using AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -38,6 +40,10 @@ builder.Services.ConfigureSwaggerGen(options =>
         options.IncludeXmlComments(xmlDocFile);
     }
 });
+
+// services
+builder.Services.AddScoped<SpeechGenerator>();
+builder.Services.AddSingleton<TextAnswerGenerator>();
 
 var app = builder.Build();
 
