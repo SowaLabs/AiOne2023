@@ -2,9 +2,9 @@
 using OpenAI;
 using AI.Dev.OpenAI.GPT;
 using Newtonsoft.Json;
-using AiOne.Chatbot.Models;
+using AiOne.Chatbot.Brain.Models;
 
-namespace AiOne.Chatbot.Logic
+namespace AiOne.Chatbot.Brain
 {
     public class Brain
     {
@@ -18,11 +18,11 @@ namespace AiOne.Chatbot.Logic
 
         private const double temp = 0.7;
 
-        private const string simModel = "text-similarity-davinci-001"; // text-embedding-ada-002
+        private const string simModel = "text-similarity-davinci-001";
         private const string model = "text-davinci-003";
 
         private const double simCutOff = 0;
-        private const int simCutOffCount = 8;
+        private const int countCutOff = 8;
 
         private List<ChatItem> knowledgeBase = new List<ChatItem>();
         private List<ChatItem> chatHistory = new List<ChatItem>();
@@ -30,8 +30,8 @@ namespace AiOne.Chatbot.Logic
 
         private OpenAIClient aiApi;
 
-        public Brain(string apiKey, string knowledgeBasePath, int responseTokenLimit = responseTokenLimit, int simCutOffCount = simCutOffCount)
-        { 
+        public Brain(string apiKey, string knowledgeBasePath, int responseTokenLimit = responseTokenLimit, int simCutOffCount = countCutOff)
+        {
             // API
             aiApi = new OpenAIClient(new OpenAIAuthentication(apiKey));
             // load knowledge base
@@ -54,7 +54,7 @@ namespace AiOne.Chatbot.Logic
             foreach (var doc in knowledgeBase)
             {
                 double cosSim = Math.Max(
-                    CosSim(embedding, doc.EmbeddingQ), 
+                    CosSim(embedding, doc.EmbeddingQ),
                     CosSim(embedding, doc.EmbeddingQA)
                 );
                 if (cosSim > simCutOff)
@@ -66,20 +66,21 @@ namespace AiOne.Chatbot.Logic
             // generate prompt
             chatHistory.Add(new ChatItem { Question = text });
             var prompt = GeneratePrompt(
-                knowledgeBaseRanked.Select(x => x.Item2).Take(simCutOffCount).ToList()
+                knowledgeBaseRanked.Select(x => x.Item2).Take(countCutOff).ToList()
             );
             var task = aiApi.CompletionsEndpoint.CreateCompletionAsync(prompt, temperature: temp, model: model, maxTokens: responseTokenLimit, topP: 1, stopSequences: new[] { $"{humanName}:", $"{aiName}:", endToken });
             task.Wait();
             var responseText = task.Result.ToString().Trim();
             chatHistory.Last().Answer = responseText;
-            return new Response { 
+            return new Response
+            {
                 Prompt = prompt,
                 Text = responseText
             };
         }
 
         public void ClearHistory()
-        { 
+        {
             chatHistory.Clear();
         }
 
@@ -92,7 +93,7 @@ namespace AiOne.Chatbot.Logic
             public double[] EmbeddingA { get; set; }
             public double[] EmbeddingQA { get; set; }
 
-            public string ToString()
+            public override string ToString()
             {
                 return $"{humanName}: {Question}\n{aiName}: {Answer}\n";
             }
@@ -117,7 +118,7 @@ namespace AiOne.Chatbot.Logic
             return sim;
         }
 
-        private static int CountTokens(string text) 
+        private static int CountTokens(string text)
         {
             return GPT3Tokenizer.Encode(text).Count;
         }
@@ -131,10 +132,10 @@ namespace AiOne.Chatbot.Logic
             // add knowledge base
             foreach (var item in knowledgeBaseRanked)
             {
-                var qa = item.ToString();
-                if (tokensLeft - CountTokens(qa) <= 0) { break; }
-                prompt.Append(qa);
-                tokensLeft -= CountTokens(qa);
+                var itemStr = item.ToString();
+                if (tokensLeft - CountTokens(itemStr) <= 0) { break; }
+                prompt.Append(itemStr);
+                tokensLeft -= CountTokens(itemStr);
             }
             // add chat history
             int i = chatHistory.Count - 1 - 1; // ignore the last entry
@@ -161,6 +162,6 @@ namespace AiOne.Chatbot.Logic
                 throw new Exception("Unexpected response from Embeddings endpoint.");
             }
             return embeddings[0].Embedding;
-        } 
+        }
     }
 }

@@ -1,1 +1,1 @@
-docker build . -f AiOneChatbot/Dockerfile -t sowalabs/aionechatbot:latest
+docker build . -f AiOneChatbot/Dockerfile -t mgrcar/chatbot:latest

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AiOneChatbot", "AiOneChatbo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Brain", "Brain\Brain.csproj", "{584DC394-6DBA-41E2-9961-B4C5AF5A03E3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mouth", "Mouth\Mouth.csproj", "{2BBD7956-7E04-42D2-9AC0-F238ACBFC528}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{584DC394-6DBA-41E2-9961-B4C5AF5A03E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{584DC394-6DBA-41E2-9961-B4C5AF5A03E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{584DC394-6DBA-41E2-9961-B4C5AF5A03E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BBD7956-7E04-42D2-9AC0-F238ACBFC528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BBD7956-7E04-42D2-9AC0-F238ACBFC528}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BBD7956-7E04-42D2-9AC0-F238ACBFC528}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BBD7956-7E04-42D2-9AC0-F238ACBFC528}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

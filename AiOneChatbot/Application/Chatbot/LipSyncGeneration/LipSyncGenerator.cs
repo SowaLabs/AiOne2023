@@ -1,4 +1,6 @@
-﻿using AiOneChatbot.Application.Chatbot.Dto;
+﻿using AiOne.Chatbot.Mouth;
+using AiOneChatbot.Application.Chatbot.Dto;
+using Newtonsoft.Json;
 
 namespace AiOneChatbot.Application.Chatbot.LipSyncGeneration
 {
@@ -7,20 +9,35 @@ namespace AiOneChatbot.Application.Chatbot.LipSyncGeneration
 	/// </summary>
 	public class LipSyncGenerator
 	{
-		public LipSync GenerateLipSync(byte[] audioFile)
+        private readonly Mouth _lips;
+
+        public LipSyncGenerator(Mouth lips)
 		{
-			// FIXME
+			_lips = lips;
+		}
+
+        public LipSync GenerateLipSync(byte[] audioFile)
+		{
+			var lipSyncAnim = _lips.GetLipSyncAnimation(audioFile);
+
+			var cues = JsonConvert.DeserializeObject<List<MouthCue>>(JsonConvert.SerializeObject(lipSyncAnim.Cues));
+
+			double duration = 0;
+
+			for (int i = 0; i < cues.Count - 1; i++)
+			{
+				cues[i].End = cues[i + 1].Start;
+			}
+
+			if (cues.Count > 0) 
+			{
+				duration = (cues.Last().End = cues.Last().Start);
+			}
+
 			return new LipSync
 			{
-				Duration = 0.47,
-				MouthCues = new List<MouthCue>
-				{
-					new MouthCue { Start = 0, End = 0.05, Value = "X" },
-					new MouthCue { Start = 0.05, End = 0.27, Value = "D" },
-					new MouthCue { Start = 0.27, End = 0.31, Value = "C" },
-					new MouthCue { Start = 0.31, End = 0.43, Value = "B" },
-					new MouthCue { Start = 0.43, End = 0.47, Value = "X" }
-				}
+				Duration = duration,
+				MouthCues = cues
 			};
 		}
 	}
