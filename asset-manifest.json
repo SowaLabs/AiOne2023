@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/bison-helper/static/css/main.3b030552.css",
+    "main.js": "/bison-helper/static/js/main.9edbc04c.js",
+    "static/js/787.eecdc367.chunk.js": "/bison-helper/static/js/787.eecdc367.chunk.js",
+    "static/media/sprite.png": "/bison-helper/static/media/sprite.075c1350dedcabbfefd2.png",
+    "static/media/sprite2.png": "/bison-helper/static/media/sprite2.2ec43ce330e384ca092a.png",
+    "static/media/ellipsis.svg": "/bison-helper/static/media/ellipsis.01e5a09de3237915b33dda1c1504b03d.svg",
+    "index.html": "/bison-helper/index.html",
+    "main.3b030552.css.map": "/bison-helper/static/css/main.3b030552.css.map",
+    "main.9edbc04c.js.map": "/bison-helper/static/js/main.9edbc04c.js.map",
+    "787.eecdc367.chunk.js.map": "/bison-helper/static/js/787.eecdc367.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3b030552.css",
+    "static/js/main.9edbc04c.js"
+  ]
+}
