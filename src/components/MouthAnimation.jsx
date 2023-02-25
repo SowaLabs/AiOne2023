@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from "react";
 
 const MouthAnimation = ({ duration, mouthCues }) => {
-  const [currentValue, setCurrentValue] = useState("");
+  const [currentValue, setCurrentValue] = useState("X");
 
   useEffect(() => {
     let intervalId;
     const totalDuration = duration * 1000;
+    setCurrentValue(mouthCues);
 
     const updateValue = () => {
-      const currentTime = (new Date().getTime() - startTime) / 1000;
-      //const progress = Math.min(currentTime / totalDuration, 1);
+      const currentTime = new Date().getTime() - startTime;
       const currentCue = mouthCues.find(
-        (cue) => cue.start >= currentTime && cue.end <= currentTime
+        (cue) => cue.start * 1000 >= currentTime
       );
-
-      console.log(currentTime, mouthCues, currentCue);
 
       if (currentCue) {
         setCurrentValue(currentCue.value);
@@ -22,14 +20,14 @@ const MouthAnimation = ({ duration, mouthCues }) => {
         setCurrentValue("X");
       }
 
-      if (currentTime >= totalDuration / 1000) {
+      if (currentTime >= totalDuration) {
         clearInterval(intervalId);
-        setCurrentValue("");
+        setCurrentValue("X");
       }
     };
 
     const startTime = new Date().getTime();
-    intervalId = setInterval(updateValue, 50);
+    intervalId = setInterval(updateValue, 18);
 
     return () => clearInterval(intervalId);
   }, [duration, mouthCues]);
