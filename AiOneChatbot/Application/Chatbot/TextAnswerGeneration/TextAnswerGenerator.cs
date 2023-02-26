@@ -14,11 +14,11 @@ public class TextAnswerGenerator
 		_brain = brain;
 	}
 
-	public (string answer, string prompt) GetTextAnswer(string question)
+	public (string answer, string prompt, string lang) GetTextAnswer(string question)
 	{
 		var response = _brain.GetResponse(question);
 
-		return (response.Text, response.Prompt);
+		return (response.Text, response.Prompt, response.Language);
 	}
 
 	public void DeleteHistory()

@@ -8,7 +8,7 @@ namespace AiOneChatbot.Application.Chatbot.Speech;
 /// </summary>
 public class SpeechGenerator
 {
-	public async Task<byte[]> GenerateSpeechAudioFile(string textToSpeak)
+	public async Task<byte[]> GenerateSpeechAudioFile(string textToSpeak, string lang)
 	{
 		var clientBuilder = new TextToSpeechClientBuilder
 		{
@@ -30,8 +30,8 @@ public class SpeechGenerator
 		var voiceSelection = new VoiceSelectionParams
 		{
 			// selected from: https://cloud.google.com/text-to-speech/docs/voices
-			LanguageCode = "en-US",
-			Name = "en-GB-Standard-D"
+			LanguageCode = lang == "English" ? "en-US" : "de-DE",
+			Name = lang == "English" ? "en-GB-Standard-D" : "de-DE-Wavenet-B",
 			//SsmlGender = SsmlVoiceGender.Male
 		};
 		var audioConfig = new AudioConfig

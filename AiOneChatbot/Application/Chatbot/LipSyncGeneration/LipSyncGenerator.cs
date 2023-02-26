@@ -29,7 +29,7 @@ namespace AiOneChatbot.Application.Chatbot.LipSyncGeneration
 				cues[i].End = cues[i + 1].Start;
 			}
 
-			if (cues.Count > 0) 
+			if (cues.Count > 0)
 			{
 				duration = (cues.Last().End = cues.Last().Start);
 			}
