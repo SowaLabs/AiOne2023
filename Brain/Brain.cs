@@ -2,7 +2,9 @@
 using OpenAI;
 using AI.Dev.OpenAI.GPT;
 using Newtonsoft.Json;
+using Latino.TextMining;
 using AiOne.Chatbot.Brain.Models;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AiOne.Chatbot.Brain
 {
@@ -33,6 +35,7 @@ namespace AiOne.Chatbot.Brain
         private List<string> context = new List<string>();
 
         private OpenAIClient aiApi;
+        private LanguageDetector languageDetector = LanguageDetector.GetLanguageDetectorPrebuilt();
 
         public Brain(string apiKey, string knowledgeBasePath, int responseTokenLimit = responseTokenLimitDefault, int countCutOff = countCutOffDefault)
         {
@@ -78,10 +81,23 @@ namespace AiOne.Chatbot.Brain
             task.Wait();
             var responseText = task.Result.ToString().Trim();
             chatHistory.Last().Answer = responseText;
+            // detect language
+            var ldResult = languageDetector.DetectLanguageAll(responseText);
+            var lang = Language.English;
+            foreach (var item in ldResult.OrderBy(x => x.Key))
+            {
+                if (item.Dat.Language == Language.German || item.Dat.Language == Language.English) 
+                {
+                    lang = item.Dat.Language;
+                    break;
+                } 
+            }
+            // done
             return new Response
             {
                 Prompt = prompt,
-                Text = responseText
+                Text = responseText,
+                Language = lang.ToString()
             };
         }
 

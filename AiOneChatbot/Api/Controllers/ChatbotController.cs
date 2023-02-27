@@ -33,13 +33,14 @@ public class ChatbotController : ControllerBase
     {
         try {
 			var textAnswer = _textAnswerGenerator.GetTextAnswer(question);
-			byte[] audioFile = await _speechGenerator.GenerateSpeechAudioFile(textAnswer.answer);
+			byte[] audioFile = await _speechGenerator.GenerateSpeechAudioFile(textAnswer.answer, textAnswer.lang);
             LipSync lipSync = _lipSyncGenerator.GenerateLipSync(audioFile);
 
 			return new ChatbotResponse
 			{
 				AnswerText = textAnswer.answer,
                 Prompt = textAnswer.prompt,
+                Language = textAnswer.lang,
 				AnswerSpeechAudioFile = Convert.ToBase64String(audioFile),
                 LipSyncAnimation = lipSync
 			};
