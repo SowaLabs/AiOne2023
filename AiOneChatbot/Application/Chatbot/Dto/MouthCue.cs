@@ -10,7 +10,7 @@
 		/// <summary>
 		/// In seconds.
 		/// </summary>
-		public double End { get; init; }
+		public double End { get; set; }
 
 		/// <summary>
 		/// The mouth shape to display.

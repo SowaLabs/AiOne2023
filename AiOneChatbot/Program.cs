@@ -1,4 +1,5 @@
-using AiOne.Chatbot.Logic;
+using AiOne.Chatbot.Brain;
+using AiOne.Chatbot.Mouth;
 using AiOneChatbot.Api;
 using AiOneChatbot.Application.Chatbot.LipSyncGeneration;
 using AiOneChatbot.Application.Chatbot.Speech;
@@ -37,6 +38,7 @@ public class Program
             //$"{AppContext.BaseDirectory}/FAQ_embeddings.jsonl"
             "/models/FAQ_embeddings.jsonl"
         ));
+		services.AddSingleton(new Mouth());
 		services.AddSingleton<LipSyncGenerator>();
 		services.AddSingleton<TextAnswerGenerator>();
 

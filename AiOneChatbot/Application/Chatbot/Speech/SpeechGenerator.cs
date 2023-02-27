@@ -36,7 +36,7 @@ public class SpeechGenerator
 		};
 		var audioConfig = new AudioConfig
 		{
-			AudioEncoding = AudioEncoding.Mp3,
+			AudioEncoding = AudioEncoding.Linear16,
 			//Pitch = 
 			//SpeakingRate = 
 		};

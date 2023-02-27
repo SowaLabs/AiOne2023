@@ -1,4 +1,4 @@
-﻿using AiOne.Chatbot.Logic;
+﻿using AiOne.Chatbot.Brain;
 
 namespace AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
 
