@@ -13,7 +13,9 @@ namespace AiOne.Chatbot.Brain
 
         private const string endToken = "###";
 
-        private const int responseTokenLimit = 256;
+        private const int responseTokenLimitDefault = 256;
+        private int responseTokenLimit;
+
         private const int tokenCountLimit = 4000;
 
         private const double temp = 0.7;
@@ -22,7 +24,9 @@ namespace AiOne.Chatbot.Brain
         private const string model = "text-davinci-003";
 
         private const double simCutOff = 0;
-        private const int countCutOff = 8;
+
+        private const int countCutOffDefault = 8;
+        private int countCutOff;
 
         private List<ChatItem> knowledgeBase = new List<ChatItem>();
         private List<ChatItem> chatHistory = new List<ChatItem>();
@@ -30,7 +34,7 @@ namespace AiOne.Chatbot.Brain
 
         private OpenAIClient aiApi;
 
-        public Brain(string apiKey, string knowledgeBasePath, int responseTokenLimit = responseTokenLimit, int simCutOffCount = countCutOff)
+        public Brain(string apiKey, string knowledgeBasePath, int responseTokenLimit = responseTokenLimitDefault, int countCutOff = countCutOffDefault)
         {
             // API
             aiApi = new OpenAIClient(new OpenAIAuthentication(apiKey));
@@ -44,6 +48,8 @@ namespace AiOne.Chatbot.Brain
                 $"This is a conversation between a human and an AI agent named {aiName}. {aiName} answers questions about the crypto and stock trading mobile app BISON.",
                 $"{aiName}: Hello. How can I help you today?"
             });
+            this.countCutOff = countCutOff;
+            this.responseTokenLimit = responseTokenLimit;
         }
 
         public Response GetResponse(string text)
