@@ -4,11 +4,14 @@
     <TargetFramework>net6.0</TargetFramework>
 	  <Version>1.0.0</Version>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>262f6843-1cbd-4f77-91ab-d2869802f4ba</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="GM.Utility" Version="1.3.2" />
 		<PackageReference Include="Google.Cloud.TextToSpeech.V1" Version="3.2.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -16,9 +19,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="GM.WebAPI">
-	    <HintPath>..\libs\GM.WebAPI.dll</HintPath>
-	  </Reference>
 		<PackageReference Include="EFCore.BulkExtensions" Version="6.0.1" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="8.6.3" />
 		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
@@ -35,6 +35,12 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.6.3" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.6.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="GM.WebAPI">
+	    <HintPath>..\libs\GM.WebAPI.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 	<ItemGroup>
