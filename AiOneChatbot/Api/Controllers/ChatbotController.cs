@@ -28,11 +28,12 @@ public class ChatbotController : ControllerBase
 
     [HttpGet]
     public async Task<ChatbotResponse> GetBotResponse(
-        [Required][FromQuery] string question
+        [Required][FromQuery] string question,
+        [FromQuery] string sessionId
         )
     {
         try {
-			var textAnswer = _textAnswerGenerator.GetTextAnswer(question);
+            var textAnswer = _textAnswerGenerator.GetTextAnswer(question, sessionId ?? HttpContext.Session.Id);
 			byte[] audioFile = await _speechGenerator.GenerateSpeechAudioFile(textAnswer.answer, textAnswer.lang);
             LipSync lipSync = _lipSyncGenerator.GenerateLipSync(audioFile);
 
@@ -53,8 +54,20 @@ public class ChatbotController : ControllerBase
     }
 
     [HttpDelete("history")]
-    public void DeleteHistory()
+    public void DeleteHistory(string sessionId)
     {
-        _textAnswerGenerator.DeleteHistory();
+        _textAnswerGenerator.DeleteHistory(sessionId ?? HttpContext.Session.Id);
+    }
+
+    [HttpDelete("history/all")]
+    public void DeleteHistoryAll()
+    {
+        _textAnswerGenerator.DeleteHistoryAll();
+    }
+
+    [HttpGet("session")]
+    public string GetDefaultSessionId()
+    {
+        return HttpContext.Session.Id;
     }
 }

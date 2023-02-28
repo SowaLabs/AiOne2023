@@ -4,7 +4,6 @@ using AI.Dev.OpenAI.GPT;
 using Newtonsoft.Json;
 using Latino.TextMining;
 using AiOne.Chatbot.Brain.Models;
-using System.Security.Cryptography.X509Certificates;
 
 namespace AiOne.Chatbot.Brain
 {
@@ -31,7 +30,7 @@ namespace AiOne.Chatbot.Brain
         private int countCutOff;
 
         private List<ChatItem> knowledgeBase = new List<ChatItem>();
-        private List<ChatItem> chatHistory = new List<ChatItem>();
+        private Dictionary<string, Session> sessions = new Dictionary<string, Session>();
         private List<string> context = new List<string>();
 
         private OpenAIClient aiApi;
@@ -55,8 +54,10 @@ namespace AiOne.Chatbot.Brain
             this.responseTokenLimit = responseTokenLimit;
         }
 
-        public Response GetResponse(string text)
+        public Response GetResponse(string text, string sessionId)
         {
+            PurgeStaleSessions();
+            var chatHistory = GetChatHistory(sessionId);
             var embedding = Embed(text);
             // build context
             var knowledgeBaseRanked = new List<(double, ChatItem)>();
@@ -75,7 +76,8 @@ namespace AiOne.Chatbot.Brain
             // generate prompt
             chatHistory.Add(new ChatItem { Question = text });
             var prompt = GeneratePrompt(
-                knowledgeBaseRanked.Select(x => x.Item2).Take(countCutOff).ToList()
+                knowledgeBaseRanked.Select(x => x.Item2).Take(countCutOff).ToList(),
+                chatHistory
             );
             var task = aiApi.CompletionsEndpoint.CreateCompletionAsync(prompt, temperature: temp, model: model, maxTokens: responseTokenLimit, topP: 1, stopSequences: new[] { $"{humanName}:", $"{aiName}:", endToken });
             task.Wait();
@@ -101,9 +103,17 @@ namespace AiOne.Chatbot.Brain
             };
         }
 
-        public void ClearHistory()
+        public void ClearHistory(string sessionId)
         {
-            chatHistory.Clear();
+            GetChatHistory(sessionId).Clear();
+        }
+
+        public void ClearHistoryAll()
+        {
+            lock (sessions)
+            {
+                sessions.Clear();
+            }
         }
 
         private class ChatItem
@@ -126,6 +136,14 @@ namespace AiOne.Chatbot.Brain
             public double[] Embedding { get; set; }
         }
 
+        private class Session
+        {
+            public DateTime LastAccess { get; set; }
+                = DateTime.UtcNow;
+            public List<ChatItem> ChatHistory { get; set; }   
+                = new List<ChatItem>();
+        }
+
         private static double CosSim(double[] a, double[] b)
         {
             if (a.Length != b.Length)
@@ -145,7 +163,7 @@ namespace AiOne.Chatbot.Brain
             return GPT3Tokenizer.Encode(text).Count;
         }
 
-        private string GeneratePrompt(List<ChatItem> knowledgeBaseRanked)
+        private string GeneratePrompt(List<ChatItem> knowledgeBaseRanked, List<ChatItem> chatHistory)
         {
             var prompt = new StringBuilder();
             var lastInput = chatHistory.Last().ToString().TrimEnd('\n');
@@ -184,6 +202,38 @@ namespace AiOne.Chatbot.Brain
                 throw new Exception("Unexpected response from Embeddings endpoint.");
             }
             return embeddings[0].Embedding;
+        }
+
+        private List<ChatItem> GetChatHistory(string sessionId)
+        {
+            lock (sessions)
+            {
+                if (!sessions.TryGetValue(sessionId, out var session))
+                {
+                    sessions[sessionId] = (session = new Session());
+                }
+                session.LastAccess = DateTime.UtcNow;
+                return session.ChatHistory;
+            }
+        }
+
+        private void PurgeStaleSessions()
+        {
+            lock (sessions)
+            {
+                var staleSessions = new List<string>();
+                foreach (var session in sessions)
+                {
+                    if (DateTime.UtcNow - session.Value.LastAccess > TimeSpan.FromMinutes(5)) // WARNME: hardcoded
+                    {
+                        staleSessions.Add(session.Key);
+                    }
+                }
+                foreach (var staleSessionId in staleSessions)
+                {
+                    sessions.Remove(staleSessionId);
+                }
+            }
         }
     }
 }

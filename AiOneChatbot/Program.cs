@@ -7,6 +7,7 @@ using AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
 using AiOneChatbot.Application.Config;
 using GM.Utility;
 using GM.WebAPI;
+using Microsoft.AspNetCore.Session;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -22,7 +23,8 @@ public class Program
 			setupSwaggerUI: SetupSwaggerUI,
 			addCorsMiddleWare: false,
 			addAuthMiddleware: false,
-			xmlDocTypes: new Type[] { typeof(Program) }
+			xmlDocTypes: new Type[] { typeof(Program) },
+			additionalMiddleware: new List<Type>(new[] { typeof(SessionMiddleware) })
 			);
 	}
 
@@ -42,16 +44,15 @@ public class Program
 		services.AddSingleton<LipSyncGenerator>();
 		services.AddSingleton<TextAnswerGenerator>();
 
-		// cors
-		//string[] allowedOrigins = "*"
-		//	.Split(';')
-		//	.Select(url =>
-		//	{
-		//		return new Uri(url.Trim()).GetLeftPart(UriPartial.Authority);
-		//	})
-		//	.Distinct()
-		//	.ToArray();
-		string[] allowedOrigins = new string[] { "*" };
+        services.AddDistributedMemoryCache();
+        services.AddSession(options =>
+        {
+			options.IdleTimeout = TimeSpan.FromMinutes(5); // WARNME: hardcoded
+            //options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
+
+        string[] allowedOrigins = new string[] { "*" };
 		services.AddCors(options =>
 		{
 			options.AddDefaultPolicy(corsPolicyBuilder =>
