@@ -24,8 +24,10 @@ public class Program
 			addCorsMiddleWare: false,
 			addAuthMiddleware: false,
 			xmlDocTypes: new Type[] { typeof(Program) },
-			additionalMiddleware: new List<Type>(new[] { typeof(SessionMiddleware) })
-			);
+			additionalMiddleware: new List<Type>(new[] { 
+				typeof(SessionMiddleware), 
+				typeof(RetainSessionMiddleware) 
+			}));
 	}
 
 	private static void ConfigureServices(
@@ -48,8 +50,6 @@ public class Program
         services.AddSession(options =>
         {
 			options.IdleTimeout = TimeSpan.FromMinutes(5); // WARNME: hardcoded
-            //options.Cookie.HttpOnly = true;
-            options.Cookie.IsEssential = true;
         });
 
         string[] allowedOrigins = new string[] { "*" };
@@ -85,4 +85,20 @@ public class Program
 			name: $"{AiOneChatbotApiInfo.SERVICE_NAME} {AiOneChatbotApiInfo.SERVICE_API_GROUP_CHATBOT.ToTitleCase()} API"
 			);
 	}
+
+    private class RetainSessionMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public RetainSessionMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public Task Invoke(HttpContext httpContext)
+		{
+            httpContext.Session.Set("Init", new byte[] { 0 });
+            return _next(httpContext);
+        }
+    }
 }
