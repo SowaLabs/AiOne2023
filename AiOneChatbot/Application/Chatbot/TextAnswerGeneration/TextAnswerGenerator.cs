@@ -14,15 +14,20 @@ public class TextAnswerGenerator
 		_brain = brain;
 	}
 
-	public (string answer, string prompt, string lang) GetTextAnswer(string question)
+	public (string answer, string prompt, string lang) GetTextAnswer(string question, string sessionId)
 	{
-		var response = _brain.GetResponse(question);
+		var response = _brain.GetResponse(question, sessionId);
 
 		return (response.Text, response.Prompt, response.Language);
 	}
 
-	public void DeleteHistory()
+	public void DeleteHistory(string sessionId)
 	{
-		_brain.ClearHistory();
+		_brain.ClearHistory(sessionId);
+	}
+
+	public void DeleteHistoryAll()
+	{
+		_brain.ClearHistoryAll();
 	}
 }

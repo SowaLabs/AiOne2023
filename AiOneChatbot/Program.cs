@@ -7,6 +7,7 @@ using AiOneChatbot.Application.Chatbot.TextAnswerGeneration;
 using AiOneChatbot.Application.Config;
 using GM.Utility;
 using GM.WebAPI;
+using Microsoft.AspNetCore.Session;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -22,8 +23,11 @@ public class Program
 			setupSwaggerUI: SetupSwaggerUI,
 			addCorsMiddleWare: false,
 			addAuthMiddleware: false,
-			xmlDocTypes: new Type[] { typeof(Program) }
-			);
+			xmlDocTypes: new Type[] { typeof(Program) },
+			additionalMiddleware: new List<Type>(new[] { 
+				typeof(SessionMiddleware), 
+				typeof(RetainSessionMiddleware) 
+			}));
 	}
 
 	private static void ConfigureServices(
@@ -42,16 +46,13 @@ public class Program
 		services.AddSingleton<LipSyncGenerator>();
 		services.AddSingleton<TextAnswerGenerator>();
 
-		// cors
-		//string[] allowedOrigins = "*"
-		//	.Split(';')
-		//	.Select(url =>
-		//	{
-		//		return new Uri(url.Trim()).GetLeftPart(UriPartial.Authority);
-		//	})
-		//	.Distinct()
-		//	.ToArray();
-		string[] allowedOrigins = new string[] { "*" };
+        services.AddDistributedMemoryCache();
+        services.AddSession(options =>
+        {
+			options.IdleTimeout = TimeSpan.FromMinutes(5); // WARNME: hardcoded
+        });
+
+        string[] allowedOrigins = new string[] { "*" };
 		services.AddCors(options =>
 		{
 			options.AddDefaultPolicy(corsPolicyBuilder =>
@@ -84,4 +85,20 @@ public class Program
 			name: $"{AiOneChatbotApiInfo.SERVICE_NAME} {AiOneChatbotApiInfo.SERVICE_API_GROUP_CHATBOT.ToTitleCase()} API"
 			);
 	}
+
+    private class RetainSessionMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public RetainSessionMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public Task Invoke(HttpContext httpContext)
+		{
+            httpContext.Session.Set("Init", new byte[] { 0 });
+            return _next(httpContext);
+        }
+    }
 }

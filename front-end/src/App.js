@@ -4,11 +4,20 @@ import HistoryRow from "./components/HistoryRow";
 import MouthAnimation from "./components/MouthAnimation";
 import ellipsis from "./ellipsis.svg";
 
-const fetchResponse = async (question) => {
+const uuidv4 = () =>
+  ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16)
+  );
+
+const fetchResponse = async (question, uuid) => {
   try {
     const response = await fetch(
       `https://chatbot.oddbit-retro.org/chatbot?${new URLSearchParams({
         question,
+        sessionId: uuid,
       })}`
     );
     const data = await response.json();
@@ -53,6 +62,7 @@ const App = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isAnswering, setIsAnswering] = useState(false);
   const [duration, setDuration] = useState(0);
+  const [sessionId] = useState(uuidv4());
   const [mouthCues, setMouthCues] = useState([]);
   const historyChatRef = useRef(null);
   const inputRef = useRef(null);
@@ -77,7 +87,7 @@ const App = () => {
 
   const handleAnswering = async (newQuestion, newHistory) => {
     setIsAnswering(true);
-    const answer = await fetchResponse(newQuestion);
+    const answer = await fetchResponse(newQuestion, sessionId);
     if (answer.audio) {
       playAudio(answer.audio);
     }
