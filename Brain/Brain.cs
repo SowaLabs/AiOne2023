@@ -2,7 +2,6 @@
 using OpenAI;
 using AI.Dev.OpenAI.GPT;
 using Newtonsoft.Json;
-using Latino.TextMining;
 using AiOne.Chatbot.Brain.Models;
 
 namespace AiOne.Chatbot.Brain
@@ -34,7 +33,6 @@ namespace AiOne.Chatbot.Brain
         private List<string> context = new List<string>();
 
         private OpenAIClient aiApi;
-        private LanguageDetector languageDetector = LanguageDetector.GetLanguageDetectorPrebuilt();
 
         public Brain(string apiKey, string knowledgeBasePath, int responseTokenLimit = responseTokenLimitDefault, int countCutOff = countCutOffDefault)
         {
@@ -83,23 +81,12 @@ namespace AiOne.Chatbot.Brain
             task.Wait();
             var responseText = task.Result.ToString().Trim();
             chatHistory.Last().Answer = responseText;
-            // detect language
-            var ldResult = languageDetector.DetectLanguageAll(responseText);
-            var lang = Language.English;
-            foreach (var item in ldResult.OrderBy(x => x.Key))
-            {
-                if (item.Dat.Language == Language.German || item.Dat.Language == Language.English) 
-                {
-                    lang = item.Dat.Language;
-                    break;
-                } 
-            }
             // done
             return new Response
             {
                 Prompt = prompt,
                 Text = responseText,
-                Language = lang.ToString()
+                Language = GetLanguage(responseText)
             };
         }
 
@@ -202,6 +189,19 @@ namespace AiOne.Chatbot.Brain
                 throw new Exception("Unexpected response from Embeddings endpoint.");
             }
             return embeddings[0].Embedding;
+        }
+
+        private string GetLanguage(string text)
+        {
+            var task = aiApi.CompletionsEndpoint.CreateCompletionAsync($@"
+                This is a language detector. It detects either ""English"" or ""German"".
+                Sentence: {text}
+                Language: ", temperature: 0, model: model, maxTokens: 1, topP: 1, stopSequences: new[] { $"Sentence:", $"Language:" });
+            task.Wait();
+            var responseText = task.Result.ToString().Trim();
+            return new[] { "English", "German" }.Contains(responseText) 
+                ? responseText 
+                : "English";
         }
 
         private List<ChatItem> GetChatHistory(string sessionId)

@@ -12,8 +12,4 @@
     <PackageReference Include="OpenAI-DotNet" Version="4.4.4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Latino\src\Latino.TextMining\Latino.TextMining.csproj" />
-  </ItemGroup>
-
 </Project>
