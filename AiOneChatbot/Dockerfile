@@ -10,9 +10,6 @@ WORKDIR /src
 COPY ["AiOneChatbot/AiOneChatbot.csproj", "AiOneChatbot/"]
 COPY ["Brain/Brain.csproj", "Brain/"]
 COPY ["Mouth/Mouth.csproj", "Mouth/"]
-COPY ["Latino/src/Latino/Latino.csproj", "Latino/src/Latino/"]
-COPY ["Latino/src/Latino.Model/Latino.Model.csproj", "Latino/src/Latino.Model/"]
-COPY ["Latino/src/Latino.TextMining/Latino.TextMining.csproj", "Latino/src/Latino.TextMining/"]
 RUN dotnet restore "AiOneChatbot/AiOneChatbot.csproj"
 COPY . .
 WORKDIR "/src/AiOneChatbot"
